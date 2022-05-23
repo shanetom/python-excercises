@@ -28,6 +28,7 @@ def main():
     else:
         name = 'World'
     print('Howdy', name)
+    print('Yay!')
 
 
 # This is the standard boilerplate that calls the main() function.
