@@ -71,7 +71,7 @@ def get_dict(filename):
     for line in f:
         for word in line.split():
             if word in word_freq_dict:
-                count = word_freq_dict.get(word)
+                count = word_freq_dict[word]
                 word_freq_dict[word] = count + 1
             else:
                 word_freq_dict[word.lower()] = 1
