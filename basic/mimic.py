@@ -78,8 +78,6 @@ def print_mimic(mimic_dict_input, word):
         random_word_from_list = random.choice(random_list)
         print(random_word_from_list)
 
-    return None
-
 
 # Provided main(), calls mimic_dict() and mimic()
 def main():
