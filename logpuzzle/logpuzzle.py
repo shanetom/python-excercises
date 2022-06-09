@@ -10,6 +10,7 @@ import os
 import re
 import sys
 import urllib
+import urllib.request
 
 """Logpuzzle exercise
 Given an apache logfile, find the puzzle urls and download the images.
@@ -20,42 +21,74 @@ Here's what a puzzle url looks like:
 
 
 def read_urls(filename):
-  """Returns a list of the puzzle urls from the given log file,
-  extracting the hostname from the filename itself.
-  Screens out duplicate urls and returns the urls sorted into
-  increasing order."""
-  # +++your code here+++
-  
+    puzzle_url_set = set()
+    prefix = 'http://'
+
+    match = re.search(r'(\w+)_(.+)', filename)
+    type_sort = match.group(1)
+    domain = match.group(2)
+
+    f = open(filename, 'r')
+
+    for line in f:
+        match = re.search(r'\s(\S+puzzle\S+)\s', line)
+        if match:
+            url = match.group(1)
+            puzzle_url_set.add(prefix + domain + url)
+
+    puzzle_url_list = []
+    if type_sort == 'animal':
+        puzzle_url_list = sorted(list(puzzle_url_set))
+
+    if type_sort == 'place':
+        puzzle_url_list = sorted(list(puzzle_url_set), key=lambda i: re.search(r'-(\w+).jpg', i).group(1))
+
+    f.close()
+    return puzzle_url_list
+
 
 def download_images(img_urls, dest_dir):
-  """Given the urls already in the correct order, downloads
-  each image into the given directory.
-  Gives the images local filenames img0, img1, and so on.
-  Creates an index.html in the directory
-  with an img tag to show each local image file.
-  Creates the directory if necessary.
-  """
-  # +++your code here+++
-  
+    if not os.path.exists(dest_dir):
+        os.mkdir(dest_dir)
+
+    count = 0
+    for img in img_urls:
+        img_file_name = dest_dir + 'img' + str(count) + '.jpg'
+        urllib.request.urlretrieve(img, img_file_name)
+        count += 1
+
+    complete_name = os.path.join(dest_dir, "index.html")
+    f = open(complete_name, 'w')
+    html_text = """
+    <html>
+    <body>
+    <img src="img0.jpg"><img src="img1.jpg"><img src="img2.jpg"><img src="img3.jpg"><img src="img4.jpg"><img src="img5.jpg"><img src="img6.jpg"><img src="img7.jpg"><img src="img8.jpg"><img src="img9.jpg"><img src="img10.jpg"><img src="img11.jpg"><img src="img12.jpg"><img src="img13.jpg"><img src="img14.jpg"><img src="img15.jpg"><img src="img16.jpg"><img src="img17.jpg"><img src="img18.jpg"><img src="img19.jpg">
+    </body>
+    </html>"""
+
+    f.write(html_text)
+    f.close()
+
 
 def main():
-  args = sys.argv[1:]
+    args = sys.argv[1:]
 
-  if not args:
-    print 'usage: [--todir dir] logfile '
-    sys.exit(1)
+    if not args:
+        print('usage: [--todir dir] logfile ')
+        sys.exit(1)
 
-  todir = ''
-  if args[0] == '--todir':
-    todir = args[1]
-    del args[0:2]
+    todir = ''
+    if args[0] == '--todir':
+        todir = args[1]
+        del args[0:2]
 
-  img_urls = read_urls(args[0])
+    img_urls = read_urls(args[0])
 
-  if todir:
-    download_images(img_urls, todir)
-  else:
-    print '\n'.join(img_urls)
+    if todir:
+        download_images(img_urls, todir)
+    else:
+        print('\n'.join(img_urls))
+
 
 if __name__ == '__main__':
-  main()
+    main()
